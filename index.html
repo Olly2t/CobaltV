@@ -1,114 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CobaltV - Latest Mods</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Secure Uploads</title>
+  <style>
+    body { font-family: sans-serif; background: #f2f2f2; padding: 20px; }
+    .upload-form, .item { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .item img { max-width: 150px; display: block; margin-bottom: 10px; }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">
-            <img src="logo.png" alt="CobaltV Logo">
-        </div>
-        <div class="top-bar">
-            <button class="discord-btn" onclick="window.open('https://discord.gg/3XqwTaw8xv')">Join Our Discord</button>
-        </div>
-    </header>
+  <!-- Upload Form (Only visible to localhost via JS check) -->
+  <div id="upload-section" class="upload-form" style="display: none;">
+    <h2>Upload File</h2>
+    <form action="upload.php" method="POST" enctype="multipart/form-data">
+      <label>Title: <input type="text" name="title" required></label><br><br>
+      <label>Description: <textarea name="description" required></textarea></label><br><br>
+      <label>Thumbnail: <input type="file" name="thumbnail" accept="image/*" required></label><br><br>
+      <label>File: <input type="file" name="file" required></label><br><br>
+      <button type="submit">Upload</button>
+    </form>
+  </div>
 
-    <main>
-        <section class="mod-section">
-            <h2>Latest Mods</h2>
-            <div class="mod-container">
-                <!-- Existing Mods -->
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://img.gta5-mods.com/q95/images/scripthookv-net/71c15e-SHVDN.png" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>ScriptHookV</h3>
-                        <p>Script Hook V is the library that allows to use GTA V script native functions in custom *.asi plugins. Note that it doesn't work in GTA Online, script hook closes GTA V when player goes in multiplayer</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/3S4MAj')">Download</button>
-                    </div>
-                </div>
+  <h2>Uploaded Files</h2>
+  <div id="items"></div>
 
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://c10.patreonusercontent.com/4/patreon-media/p/post/125440638/0f7c4bd798c6437a8285721e80634f69/eyJ3Ijo2MjB9/1.png?token-time=1744934400&token-hash=N7kl2t5P0zzApeFDhaaUi_6dX1grj7o4Ua8TyOcSdpc%3D" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>CoreFX</h3>
-                        <p>CoreFX is a free alternative graphical modification for Grand Theft Auto V.</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/njXzu9')">Download</button>
-                    </div>
-                </div>
+  <script>
+    // Show upload section only if localhost
+    if (['127.0.0.1', '::1'].includes(location.hostname)) {
+      document.getElementById('upload-section').style.display = 'block';
+    }
 
-                <!-- New Mods -->
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://via.placeholder.com/150" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>Enhanced Weather</h3>
-                        <p>Revamp GTA V's weather system with realistic lighting, thunder, and rain effects.</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/sample1')">Download</button>
-                    </div>
-                </div>
-
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://via.placeholder.com/150" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>Real Car Pack</h3>
-                        <p>Replaces in-game vehicles with high-quality real-life car models.</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/sample2')">Download</button>
-                    </div>
-                </div>
-
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://via.placeholder.com/150" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>Better Explosions</h3>
-                        <p>More intense, cinematic explosions with smoke and debris effects.</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/sample3')">Download</button>
-                    </div>
-                </div>
-
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://via.placeholder.com/150" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>Police AI+ Overhaul</h3>
-                        <p>Smarter law enforcement that uses tactics and better vehicle handling.</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/sample4')">Download</button>
-                    </div>
-                </div>
-
-                <div class="mod-item">
-                    <div class="mod-thumbnail">
-                        <img src="https://via.placeholder.com/150" alt="Mod Thumbnail">
-                    </div>
-                    <div class="mod-info">
-                        <h3>Dynamic Lighting Plus</h3>
-                        <p>Improves lighting effects throughout the city for better immersion.</p>
-                        <button class="download-btn" onclick="goToLink('https://gofile.io/d/sample5')">Download</button>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-    </main>
-
-    <script>
-        function goToLink(url) {
-            window.open(url, '_blank');
-        }
-    </script>
+    // Load items
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('items');
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <img src="${item.thumbnail}" alt="Thumbnail">
+            <h3>${item.title}</h3>
+            <p>${item.description}</p>
+            <a href="${item.file}" download>Download File</a>
+          `;
+          container.appendChild(div);
+        });
+      });
+  </script>
 
 </body>
 </html>
