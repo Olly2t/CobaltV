@@ -1,6 +1,6 @@
 <?php
 // Restrict to localhost
-if ($_SERVER['REMOTE_ADDR'] !== '192.168.7.1') {
+if ($_SERVER['REMOTE_ADDR'] !== '192.168.7.10') {
     http_response_code(403);
     echo "Forbidden";
     exit;
