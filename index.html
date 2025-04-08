@@ -228,6 +228,42 @@
             background: #ff3b2f;
         }
 
+        /* Modal for Delete and Re-Prompt options */
+        #message-options {
+            display: none;
+            background: #222;
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(255, 111, 97, 0.6);
+            width: 250px;
+            z-index: 11;
+            text-align: center;
+        }
+
+        #message-options button {
+            background: #ff6f61;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #message-options button:hover {
+            background: #ff3b2f;
+            transform: scale(1.1);
+        }
+
+        #message-options button:active {
+            transform: scale(1);
+        }
     </style>
 </head>
 <body>
@@ -275,46 +311,49 @@
             </div>
             <button id="apply-settings">Apply Settings</button>
         </div>
+
+        <!-- Modal for Delete and Re-Prompt -->
+        <div id="message-options">
+            <button id="delete-message">Delete</button>
+            <button id="re-prompt">Re-Prompt</button>
+        </div>
     </div>
 
     <script>
-        const apiKey = 'RXZ4VHVpUVdYWmNqbmdvQnNyNTUyVlBSR0ltMQ'; // Your API Key
-
         let temperature = 0.7;
         let max_tokens = 150;
         let top_p = 1;
+        let chatHistory = [];
+        let currentMessageIndex = null;
 
-        // Function to add message to the chat container
-        function addMessage(content, sender = 'assistant') {
+        const apiKey = 'RXZ4VHVpUVdYWmNqbmdvQnNyNTUyVlBSR0ltMQ';
+
+        // Add message to chat history
+        function addMessage(content, sender) {
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'assistant-message');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'assistant-message');
             messageDiv.innerText = content;
-
-            // Allow deleting AI's response by clicking
-            if (sender === 'assistant') {
-                messageDiv.addEventListener('click', () => {
-                    messageDiv.remove();
-                    saveChatHistory(); // Re-save history after deletion
-                });
-            }
-
+            messageDiv.addEventListener('click', () => {
+                openMessageOptions(content, sender);
+            });
             document.getElementById('chat-container').appendChild(messageDiv);
-            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+
+            // Save message to chatHistory array
+            chatHistory.push({ content, sender });
+            saveChatHistory();
         }
 
-        // Handle user input and response
+        // Handle "Get Response" button click
         document.getElementById('get-response').addEventListener('click', () => {
             const userQuestion = document.getElementById('user-input').value;
+
             if (!userQuestion) {
                 alert("Please enter a question.");
                 return;
             }
 
-            // Display user message
             addMessage(userQuestion, 'user');
-
-            // Clear input field
-            document.getElementById('user-input').value = '';
 
             const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${apiKey}`;
 
@@ -339,7 +378,6 @@
                 .then(data => {
                     const aiResponse = data.choices[0].message.content;
                     addMessage(aiResponse, 'assistant');
-                    saveChatHistory(); // Save chat history after response
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -361,16 +399,72 @@
             document.getElementById('settings-menu').style.display = 'block';
         });
 
-        // Save and load chat history to/from localStorage
-        function saveChatHistory() {
-            const chatHistory = document.getElementById('chat-container').innerHTML;
-            localStorage.setItem('chatHistory', chatHistory);
+        // Open message options modal
+        function openMessageOptions(content, sender) {
+            currentMessageIndex = chatHistory.findIndex(msg => msg.content === content && msg.sender === sender);
+            document.getElementById('message-options').style.display = 'block';
         }
 
+        // Delete the message
+        document.getElementById('delete-message').addEventListener('click', () => {
+            chatHistory.splice(currentMessageIndex, 1);
+            saveChatHistory();
+            document.getElementById('chat-container').innerHTML = '';
+            loadChatHistory();
+            document.getElementById('message-options').style.display = 'none';
+        });
+
+        // Re-Prompt with the same question
+        document.getElementById('re-prompt').addEventListener('click', () => {
+            const question = chatHistory[currentMessageIndex].content;
+            addMessage(question, 'user');
+
+            const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${apiKey}`;
+
+            const data = {
+                messages: [
+                    { role: "system", content: "You are a helpful assistant." },
+                    { role: "user", content: question }
+                ],
+                temperature: temperature,
+                max_tokens: max_tokens,
+                top_p: top_p
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const aiResponse = data.choices[0].message.content;
+                    addMessage(aiResponse, 'assistant');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    addMessage("Sorry, something went wrong.", 'assistant');
+                });
+
+            document.getElementById('message-options').style.display = 'none';
+        });
+
+        // Save chat history to localStorage
+        function saveChatHistory() {
+            const historyJSON = JSON.stringify(chatHistory);
+            localStorage.setItem('chatHistory', historyJSON);
+        }
+
+        // Load chat history from localStorage
         function loadChatHistory() {
-            const chatHistory = localStorage.getItem('chatHistory');
-            if (chatHistory) {
-                document.getElementById('chat-container').innerHTML = chatHistory;
+            const historyJSON = localStorage.getItem('chatHistory');
+            if (historyJSON) {
+                chatHistory = JSON.parse(historyJSON);
+                chatHistory.forEach(message => {
+                    addMessage(message.content, message.sender);
+                });
             }
         }
 
