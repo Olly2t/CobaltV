@@ -18,6 +18,7 @@
             color: #e0e0e0;
             display: flex;
             height: 100vh;
+            transition: all 0.3s ease;
         }
 
         /* Sidebar */
@@ -43,6 +44,7 @@
         .chat-history {
             overflow-y: auto;
             height: 100%;
+            flex-grow: 1;
         }
 
         .chat-history div {
@@ -98,6 +100,8 @@
             margin-bottom: 10px;
             font-size: 1rem;
             max-width: 80%;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
 
         .user-message {
@@ -134,7 +138,7 @@
             background: #222;
         }
 
-        #get-response {
+        #get-response, #apply-settings {
             padding: 12px 25px;
             background: #ff6f61;
             color: #fff;
@@ -146,12 +150,12 @@
             transition: all 0.3s ease;
         }
 
-        #get-response:hover {
+        #get-response:hover, #apply-settings:hover {
             background: #ff3b2f;
             transform: scale(1.1);
         }
 
-        #get-response:active {
+        #get-response:active, #apply-settings:active {
             transform: scale(1);
         }
 
@@ -180,6 +184,22 @@
             border-radius: 5px;
             height: 8px;
             outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .slider input::-webkit-slider-thumb {
+            background: #ff6f61;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 111, 97, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .slider input::-webkit-slider-thumb:hover {
+            background: #ff3b2f;
+            transform: scale(1.2);
         }
 
         .slider label {
@@ -253,7 +273,7 @@
                 <input type="range" id="top_p" min="0" max="1" step="0.01" value="1">
                 <p id="top-p-value">1</p>
             </div>
-            <button onclick="applySettings()">Apply Settings</button>
+            <button id="apply-settings">Apply Settings</button>
         </div>
     </div>
 
@@ -269,6 +289,15 @@
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'assistant-message');
             messageDiv.innerText = content;
+
+            // Allow deleting AI's response by clicking
+            if (sender === 'assistant') {
+                messageDiv.addEventListener('click', () => {
+                    messageDiv.remove();
+                    saveChatHistory(); // Re-save history after deletion
+                });
+            }
+
             document.getElementById('chat-container').appendChild(messageDiv);
             document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
         }
@@ -302,54 +331,51 @@
             fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
-            .then(result => {
-                const responseText = result.choices[0].message.content;
-                addMessage(responseText, 'assistant');
-                saveChatHistory(userQuestion, responseText); // Save chat history
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                addMessage('Error fetching data', 'assistant');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    const aiResponse = data.choices[0].message.content;
+                    addMessage(aiResponse, 'assistant');
+                    saveChatHistory(); // Save chat history after response
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    addMessage("Sorry, something went wrong.", 'assistant');
+                });
         });
 
-        // Save chat history to sidebar
-        function saveChatHistory(userQuestion, assistantResponse) {
-            const chatHistoryDiv = document.createElement('div');
-            chatHistoryDiv.innerText = userQuestion;
-            chatHistoryDiv.addEventListener('click', () => {
-                document.getElementById('chat-container').innerHTML = `
-                    <div class="message user-message">${userQuestion}</div>
-                    <div class="message assistant-message">${assistantResponse}</div>
-                `;
-            });
-            document.getElementById('chat-history').appendChild(chatHistoryDiv);
-        }
+        // Handle settings application
+        document.getElementById('apply-settings').addEventListener('click', () => {
+            temperature = parseFloat(document.getElementById('temperature').value);
+            max_tokens = parseInt(document.getElementById('max_tokens').value);
+            top_p = parseFloat(document.getElementById('top_p').value);
+            alert("Settings applied!");
+            document.getElementById('settings-menu').style.display = 'none';
+        });
 
         // Show settings menu
         document.getElementById('settings-button').addEventListener('click', () => {
             document.getElementById('settings-menu').style.display = 'block';
         });
 
-        // Apply settings changes
-        function applySettings() {
-            temperature = parseFloat(document.getElementById('temperature').value);
-            max_tokens = parseInt(document.getElementById('max_tokens').value);
-            top_p = parseFloat(document.getElementById('top_p').value);
-
-            document.getElementById('temp-value').innerText = temperature;
-            document.getElementById('max-tokens-value').innerText = max_tokens;
-            document.getElementById('top-p-value').innerText = top_p;
-
-            document.getElementById('settings-menu').style.display = 'none';
+        // Save and load chat history to/from localStorage
+        function saveChatHistory() {
+            const chatHistory = document.getElementById('chat-container').innerHTML;
+            localStorage.setItem('chatHistory', chatHistory);
         }
 
-    </script>
+        function loadChatHistory() {
+            const chatHistory = localStorage.getItem('chatHistory');
+            if (chatHistory) {
+                document.getElementById('chat-container').innerHTML = chatHistory;
+            }
+        }
 
+        // Load chat history when page loads
+        window.onload = loadChatHistory;
+    </script>
 </body>
 </html>
