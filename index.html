@@ -4,6 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NoFilterGPT API Example</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        h2 {
+            color: #e0e0e0;
+            margin-top: 30px;
+            font-size: 1.5rem;
+        }
+
+        /* Styling the input field */
+        input[type="text"] {
+            width: 300px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            background: #333;
+            color: #fff;
+            border: 2px solid #444;
+            border-radius: 30px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff6f61;
+            background: #222;
+            box-shadow: 0 0 10px rgba(255, 111, 97, 0.8);
+        }
+
+        /* Styling the button */
+        #get-response {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #ff6f61;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(255, 111, 97, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #get-response:hover {
+            background: #ff3b2f;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 59, 47, 0.6);
+        }
+
+        #get-response:active {
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        /* Animated hover effect for input */
+        input[type="text"], #get-response {
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Styling the response area */
+        pre {
+            background: #222;
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 90%;
+            margin-top: 30px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,7 +128,7 @@
     <pre id="response"></pre>
 
     <script>
-        // CHANGE THIS VALUE HERE
+        // Use the correct API key here
         const apiKey = 'AIzacDsdsaXZ-HjGw7I11vevV';
 
         document.getElementById('get-response').addEventListener('click', () => {
@@ -27,7 +138,8 @@
                 return;
             }
 
-            const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${AIzacDsdsaXZ-HjGw7I11vevV}`;
+            // Use the apiKey variable for the URL
+            const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${apiKey}`;
 
             const data = {
                 messages: [
