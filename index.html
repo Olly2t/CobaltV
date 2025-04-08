@@ -1,37 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>File Upload (Localhost Only)</title>
-  <style>
-    #uploadSection {
-      display: none;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+        .chat-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        #chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .user-message, .ai-message {
+            margin: 5px 0;
+        }
+        .user-message {
+            text-align: right;
+        }
+        .ai-message {
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-
-  <h1>Welcome to CobaltV Upload</h1>
-
-  <div id="uploadSection">
-    <h2>Upload New Mod</h2>
-    <form>
-      <input type="text" placeholder="Title"><br><br>
-      <input type="text" placeholder="Description"><br><br>
-      <input type="file" accept="image/*"><br><br>
-      <button>Upload</button>
-    </form>
-  </div>
-
-  <script>
-    const allowedHosts = ["127.0.0.1", "localhost"];
-    if (allowedHosts.includes(window.location.hostname)) {
-      document.getElementById("uploadSection").style.display = "block";
-    }
-  </script>
-
+    <div class="chat-container">
+        <h1>Simple AI Chatbot</h1>
+        <div id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type a message..." />
+        <button id="send-button">Send</button>
+    </div>
+    
+    <script>
+        // A simple dictionary with basic responses.
+        const responses = {
+            "hi": "Hello! How can I help you today?",
+            "how are you?": "I'm just a bunch of code, but thanks for asking!",
+            "what is your name?": "I am a simple AI chatbot.",
+            "bye": "Goodbye! Have a great day!",
+        };
+        // Fallback response
+        function getFallbackResponse() {
+            return "I'm sorry, I don't understand that.";
+        }
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        function addMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'user' ? 'user-message' : 'ai-message';
+            messageDiv.textContent = message;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll to the bottom
+        }
+        sendButton.addEventListener('click', () => {
+            const userMessage = userInput.value.trim().toLowerCase();
+            if (userMessage) {
+                addMessage(userMessage, 'user');
+                userInput.value = '';
+                
+                // Simple keyword matching for responses
+                const aiResponse = responses[userMessage] || getFallbackResponse();
+                addMessage(aiResponse, 'ai');
+            }
+        });
+        // Allow pressing 'Enter' to send the message
+        userInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    </script>
 </body>
 </html>
