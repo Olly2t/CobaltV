@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NoFilterGPT API Example</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <style>
         /* Basic reset */
         * {
@@ -264,6 +265,18 @@
         #message-options button:active {
             transform: scale(1);
         }
+
+        /* Code block style */
+        pre[class*="language-"] {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            color: #f8f8f2;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -297,11 +310,11 @@
             <div class="slider">
                 <label for="temperature">Temperature (0.0 to 1.0)</label>
                 <input type="range" id="temperature" min="0" max="1" step="0.01" value="0.7">
-                <p id="temp-value">0.7</p>
+                <p id="temperature-value">0.7</p>
             </div>
             <div class="slider">
-                <label for="max_tokens">Max Tokens (1 to 1000)</label>
-                <input type="range" id="max_tokens" min="1" max="1000" step="1" value="150">
+                <label for="max_tokens">Max Tokens (10 to 500)</label>
+                <input type="range" id="max_tokens" min="10" max="500" step="10" value="150">
                 <p id="max-tokens-value">150</p>
             </div>
             <div class="slider">
@@ -319,6 +332,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script>
         let temperature = 0.7;
         let max_tokens = 150;
@@ -328,12 +342,20 @@
 
         const apiKey = 'RXZ4VHVpUVdYWmNqbmdvQnNyNTUyVlBSR0ltMQ';
 
-        // Add message to chat history
+        // Add message to chat history with syntax highlighting
         function addMessage(content, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
             messageDiv.classList.add(sender === 'user' ? 'user-message' : 'assistant-message');
-            messageDiv.innerText = content;
+
+            // Check if the message is code and highlight it
+            if (isCode(content)) {
+                const language = detectLanguage(content);
+                messageDiv.innerHTML = `<pre class="language-${language}">${Prism.highlight(content, Prism.languages[language], language)}</pre>`;
+            } else {
+                messageDiv.innerText = content;
+            }
+
             messageDiv.addEventListener('click', () => {
                 openMessageOptions(content, sender);
             });
@@ -342,6 +364,34 @@
             // Save message to chatHistory array
             chatHistory.push({ content, sender });
             saveChatHistory();
+        }
+
+        // Detect if a message contains code
+        function isCode(content) {
+            const codePatterns = [
+                /```.*?```/s, // Triple backticks (multi-line code)
+                /\b(?:def|class|function|import|var|let|const|public|private|protected)\b/i // Common keywords in many languages
+            ];
+            return codePatterns.some(pattern => pattern.test(content));
+        }
+
+        // Detect programming language based on the content (basic approach)
+        function detectLanguage(content) {
+            if (/def /.test(content) || /import /.test(content)) {
+                return 'python';
+            } else if (/function /.test(content) || /let|const|var/.test(content)) {
+                return 'javascript';
+            } else if (/class /.test(content)) {
+                return 'ruby';
+            } else if (/using /.test(content)) {
+                return 'csharp';
+            } else if (/namespace /.test(content)) {
+                return 'cpp';
+            } else if (/<!DOCTYPE html>/.test(content)) {
+                return 'html';
+            } else {
+                return 'plaintext'; // Default to plaintext
+            }
         }
 
         // Handle "Get Response" button click
