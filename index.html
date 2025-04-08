@@ -18,9 +18,10 @@
             color: #e0e0e0;
             height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px;
             overflow: hidden;
         }
 
@@ -32,17 +33,54 @@
             font-weight: bold;
         }
 
-        h2 {
-            color: #e0e0e0;
-            margin-top: 30px;
-            font-size: 1.5rem;
+        /* Chatbox layout */
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            background: #222;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+            overflow-y: auto;
+            height: 70vh;
+            max-height: 500px;
         }
 
-        /* Styling the input field */
+        .message {
+            background: #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #ff6f61;
+            align-self: flex-end;
+            border-radius: 12px;
+        }
+
+        .assistant-message {
+            background: #444;
+            align-self: flex-start;
+            border-radius: 12px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
         input[type="text"] {
-            width: 300px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
+            width: 80%;
+            padding: 12px 18px;
             background: #333;
             color: #fff;
             border: 2px solid #444;
@@ -58,10 +96,8 @@
             box-shadow: 0 0 10px rgba(255, 111, 97, 0.8);
         }
 
-        /* Styling the button */
         #get-response {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 12px 25px;
             background: #ff6f61;
             color: #fff;
             border: none;
@@ -69,6 +105,7 @@
             cursor: pointer;
             outline: none;
             box-shadow: 0 4px 15px rgba(255, 111, 97, 0.3);
+            margin-left: 10px;
             transition: all 0.3s ease;
         }
 
@@ -83,31 +120,36 @@
             box-shadow: none;
         }
 
-        /* Animated hover effect for input */
-        input[type="text"], #get-response {
-            animation: pulse 2s infinite ease-in-out;
+        /* Settings button style */
+        #settings-button {
+            padding: 10px 20px;
+            background: #444;
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            outline: none;
+            margin-top: 20px;
+            transition: all 0.3s ease;
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
+        #settings-button:hover {
+            background: #ff6f61;
+            transform: scale(1.1);
         }
 
-        /* Styling the response area */
+        #settings-button:active {
+            transform: scale(1);
+            background: #ff3b2f;
+        }
+
+        /* Response area */
         pre {
             background: #222;
             color: #fff;
             padding: 20px;
             border-radius: 15px;
-            max-width: 90%;
-            margin-top: 30px;
+            max-width: 100%;
             white-space: pre-wrap;
             word-wrap: break-word;
             font-size: 1rem;
@@ -119,17 +161,41 @@
 <body>
 
     <h1>NoFilterGPT API with Vanilla JS</h1>
-    
-    <label for="user-input">Ask a question:</label>
-    <input type="text" id="user-input" placeholder="Type your question here" />
-    <button id="get-response">Get Response</button>
+
+    <!-- Chat container for messages -->
+    <div class="chat-container" id="chat-container">
+        <!-- Messages will be added dynamically here -->
+    </div>
+
+    <!-- Input and buttons container -->
+    <div class="input-container">
+        <input type="text" id="user-input" placeholder="Type your question here" />
+        <button id="get-response">Get Response</button>
+    </div>
+
+    <!-- Settings button to modify parameters -->
+    <button id="settings-button">Settings</button>
 
     <h2>Response:</h2>
     <pre id="response"></pre>
 
     <script>
+        // Default parameters
+        let temperature = 0.7;
+        let max_tokens = 150;
+        let top_p = 1;
+
         // Use the correct API key here
         const apiKey = 'AIzacDsdsaXZ-HjGw7I11vevV';
+
+        // Function to add message to the chat container
+        function addMessage(content, sender = 'assistant') {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'assistant-message');
+            messageDiv.innerText = content;
+            document.getElementById('chat-container').appendChild(messageDiv);
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight; // Scroll to the bottom
+        }
 
         document.getElementById('get-response').addEventListener('click', () => {
             const userQuestion = document.getElementById('user-input').value;
@@ -138,7 +204,12 @@
                 return;
             }
 
-            // Use the apiKey variable for the URL
+            // Display user message
+            addMessage(userQuestion, 'user');
+
+            // Clear input field
+            document.getElementById('user-input').value = '';
+
             const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${apiKey}`;
 
             const data = {
@@ -146,9 +217,9 @@
                     { role: "system", content: "You are a helpful assistant." },
                     { role: "user", content: userQuestion }
                 ],
-                temperature: 0.7,
-                max_tokens: 150,
-                top_p: 1
+                temperature: temperature,
+                max_tokens: max_tokens,
+                top_p: top_p
             };
 
             fetch(url, {
@@ -160,12 +231,22 @@
             })
             .then(response => response.json())
             .then(result => {
-                document.getElementById('response').innerText = JSON.stringify(result, null, 2);
+                const responseText = result.choices[0].message.content;
+                addMessage(responseText, 'assistant');
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('response').innerText = 'Error fetching data';
+                addMessage('Error fetching data', 'assistant');
             });
+        });
+
+        document.getElementById('settings-button').addEventListener('click', () => {
+            // Prompt user to input new values for settings
+            temperature = parseFloat(prompt("Enter temperature (0.0 to 1.0):", temperature));
+            max_tokens = parseInt(prompt("Enter max tokens:", max_tokens));
+            top_p = parseFloat(prompt("Enter top_p (0.0 to 1.0):", top_p));
+
+            alert("Settings updated!");
         });
     </script>
     
