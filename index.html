@@ -3,358 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat Interface</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <title>Hardware Simulator</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 50px auto;
-            background-color: #fff;
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #111;
+            color: #fff;
+            overflow: hidden;
+        }
+        #container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: -1;
+        }
+        #hardwareMonitor, #hardwareSelection, #settings {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            z-index: 1;
         }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        #chat-container {
-            max-height: 400px;
+        #hardwareMonitor {
+            top: 50px;
+            left: 50px;
+            width: 300px;
+            height: 200px;
             overflow-y: auto;
-            margin-bottom: 20px;
-            padding-right: 10px;
         }
-
-        .message {
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            max-width: 80%;
+        #hardwareSelection {
+            top: 50px;
+            right: 50px;
+            width: 300px;
+            height: 250px;
         }
-
-        .user-message {
-            background-color: #e1f5fe;
-            margin-left: auto;
-            text-align: right;
+        #settings {
+            bottom: 50px;
+            left: 50px;
+            width: 400px;
+            height: 150px;
         }
-
-        .assistant-message {
-            background-color: #f1f1f1;
-            margin-right: auto;
-            text-align: left;
-        }
-
-        .message code {
-            background-color: #282c34;
-            color: #f8f8f2;
-            padding: 5px;
-            border-radius: 4px;
-        }
-
-        #settings-menu {
-            display: none;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-
         .slider {
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        input[type="range"] {
             width: 100%;
-            margin: 5px 0;
+            margin-bottom: 10px;
         }
-
-        button {
-            background-color: #00796b;
-            color: white;
-            padding: 10px 15px;
+        .slider label {
+            color: #ff00ff;
+        }
+        .text {
+            font-size: 14px;
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
-
-        button:hover {
-            background-color: #004d40;
+        .button:hover {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
         }
-
-        #message-options {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #ffffff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        #message-options button {
-            background-color: #f44336;
-            margin-right: 10px;
-        }
-
-        #message-options button:nth-child(2) {
-            background-color: #4caf50;
-        }
-
-        .slider p {
-            font-size: 14px;
-            color: #333;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+        #sphere {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background-color: #222;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>AI Chat Interface</h1>
-        <div id="chat-container"></div>
-        <input type="text" id="user-input" placeholder="Ask me anything...">
-        <button id="get-response">Get Response</button>
-        <button id="settings-button">Settings</button>
-
-        <div id="settings-menu">
-            <div class="slider">
-                <label for="temperature">Temperature (0.0 to 1.0)</label>
-                <input type="range" id="temperature" min="0" max="1" step="0.01" value="0.7">
-                <p id="temperature-value">0.7</p>
-            </div>
-            <div class="slider">
-                <label for="max_tokens">Max Tokens (10 to 500)</label>
-                <input type="range" id="max_tokens" min="10" max="500" step="10" value="150">
-                <p id="max-tokens-value">150</p>
-            </div>
-            <div class="slider">
-                <label for="top_p">Top P (0.0 to 1.0)</label>
-                <input type="range" id="top_p" min="0" max="1" step="0.01" value="1">
-                <p id="top-p-value">1</p>
-            </div>
-            <button id="apply-settings">Apply Settings</button>
-        </div>
-
-        <div id="message-options">
-            <button id="delete-message">Delete</button>
-            <button id="re-prompt">Re-Prompt</button>
-        </div>
+    <div id="hardwareMonitor">
+        <h3>Hardware Monitor</h3>
+        <div class="text">GPU: RTX 3080</div>
+        <div class="text">CPU: Intel i9</div>
+        <div class="text">FPS: 60</div>
+        <div class="text">Temperature: 50°C</div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <div id="hardwareSelection">
+        <h3>Hardware Selection</h3>
+        <div class="text">Select CPU</div>
+        <select>
+            <option>Intel i7</option>
+            <option>Intel i9</option>
+            <option>AMD Ryzen 7</option>
+            <option>AMD Ryzen 9</option>
+        </select>
+        <div class="text">Select GPU</div>
+        <select>
+            <option>RTX 3060</option>
+            <option>RTX 3080</option>
+            <option>RTX 3090</option>
+            <option>GTX 1660</option>
+        </select>
+    </div>
+
+    <div id="settings">
+        <h3>Settings</h3>
+        <label for="textureQuality">Texture Quality</label>
+        <input type="range" id="textureQuality" class="slider" min="1" max="10" value="5">
+        <label for="lightIntensity">Light Intensity</label>
+        <input type="range" id="lightIntensity" class="slider" min="1" max="10" value="5">
+        <label for="sphereRotation">Sphere Rotation</label>
+        <input type="range" id="sphereRotation" class="slider" min="0" max="360" value="0">
+        <button class="button" id="saveButton">Save Settings</button>
+    </div>
+
+    <div id="sphere"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let temperature = 0.7;
-        let max_tokens = 150;
-        let top_p = 1;
-        let chatHistory = [];
-        let currentMessageIndex = null;
+        // Three.js Sphere Rendering
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-        const apiKey = 'RXZ4VHVpUVdYWmNqbmdvQnNyNTUyVlBSR0ltMQ';
+        const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
+        const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x0077ff });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        scene.add(sphere);
 
-        // Add message to chat history with syntax highlighting
-        function addMessage(content, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'assistant-message');
+        const light = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(light);
 
-            // Check if the message is code and highlight it
-            if (isCode(content)) {
-                const language = detectLanguage(content);
-                messageDiv.innerHTML = `<pre class="language-${language}">${Prism.highlight(content, Prism.languages[language], language)}</pre>`;
-            } else {
-                messageDiv.innerText = content;
-            }
+        camera.position.z = 5;
 
-            messageDiv.addEventListener('click', () => {
-                openMessageOptions(content, sender);
-            });
-            document.getElementById('chat-container').appendChild(messageDiv);
-
-            // Save message to chatHistory array
-            chatHistory.push({ content, sender });
-            saveChatHistory();
+        function animate() {
+            requestAnimationFrame(animate);
+            sphere.rotation.x += 0.01;
+            sphere.rotation.y += 0.01;
+            renderer.render(scene, camera);
         }
 
-        // Detect if a message contains code
-        function isCode(content) {
-            const codePatterns = [
-                /```.*?```/s, // Triple backticks (multi-line code)
-                /\b(?:def|class|function|import|var|let|const|public|private|protected)\b/i // Common keywords in many languages
-            ];
-            return codePatterns.some(pattern => pattern.test(content));
+        animate();
+
+        // Audio Reactive Light
+        let audio = new Audio('your-audio-file.mp3');
+        let analyser = new (window.AudioContext || window.webkitAudioContext)().createAnalyser();
+        let source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        analyser.fftSize = 256;
+        let bufferLength = analyser.frequencyBinCount;
+        let dataArray = new Uint8Array(bufferLength);
+
+        function updateAudioReactiveLight() {
+            analyser.getByteFrequencyData(dataArray);
+            let averageFrequency = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
+            light.intensity = averageFrequency / 255;
+            requestAnimationFrame(updateAudioReactiveLight);
         }
 
-        // Detect programming language based on the content (basic approach)
-        function detectLanguage(content) {
-            if (/def /.test(content) || /import /.test(content)) {
-                return 'python';
-            } else if (/function /.test(content) || /let|const|var/.test(content)) {
-                return 'javascript';
-            } else if (/class /.test(content)) {
-                return 'ruby';
-            } else if (/using /.test(content)) {
-                return 'csharp';
-            } else if (/namespace /.test(content)) {
-                return 'cpp';
-            } else if (/<!DOCTYPE html>/.test(content)) {
-                return 'html';
-            } else {
-                return 'plaintext'; // Default to plaintext
-            }
-        }
+        updateAudioReactiveLight();
 
-        // Handle "Get Response" button click
-        document.getElementById('get-response').addEventListener('click', () => {
-            const userQuestion = document.getElementById('user-input').value;
-
-            if (!userQuestion) {
-                alert("Please enter a question.");
-                return;
-            }
-
-            addMessage(userQuestion, 'user');
-
-            const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${apiKey}`;
-
-            const data = {
-                messages: [
-                    { role: "system", content: "You are a helpful assistant." },
-                    { role: "user", content: userQuestion }
-                ],
-                temperature: temperature,
-                max_tokens: max_tokens,
-                top_p: top_p
-            };
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const aiResponse = data.choices[0].message.content;
-                    addMessage(aiResponse, 'assistant');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    addMessage("Sorry, something went wrong.", 'assistant');
-                });
+        // Slider Functions
+        document.getElementById('textureQuality').addEventListener('input', (e) => {
+            let value = e.target.value;
+            sphereMaterial.map = new THREE.TextureLoader().load(`textures/texture${value}.jpg`);
         });
 
-        // Handle settings application
-        document.getElementById('apply-settings').addEventListener('click', () => {
-            temperature = parseFloat(document.getElementById('temperature').value);
-            max_tokens = parseInt(document.getElementById('max_tokens').value);
-            top_p = parseFloat(document.getElementById('top_p').value);
-            alert("Settings applied!");
-            document.getElementById('settings-menu').style.display = 'none';
+        document.getElementById('lightIntensity').addEventListener('input', (e) => {
+            light.intensity = e.target.value / 10;
         });
 
-        // Show settings menu
-        document.getElementById('settings-button').addEventListener('click', () => {
-            document.getElementById('settings-menu').style.display = 'block';
+        document.getElementById('sphereRotation').addEventListener('input', (e) => {
+            let value = e.target.value;
+            sphere.rotation.y = value * Math.PI / 180;
         });
 
-        // Open message options modal
-        function openMessageOptions(content, sender) {
-            currentMessageIndex = chatHistory.findIndex(msg => msg.content === content && msg.sender === sender);
-            document.getElementById('message-options').style.display = 'block';
-        }
-
-        // Delete the message
-        document.getElementById('delete-message').addEventListener('click', () => {
-            chatHistory.splice(currentMessageIndex, 1);
-            saveChatHistory();
-            document.getElementById('chat-container').innerHTML = '';
-            loadChatHistory();
-            document.getElementById('message-options').style.display = 'none';
+        // Save Button
+        document.getElementById('saveButton').addEventListener('click', () => {
+            alert('Settings Saved!');
         });
-
-        // Re-Prompt with the same question
-        document.getElementById('re-prompt').addEventListener('click', () => {
-            const question = chatHistory[currentMessageIndex].content;
-            addMessage(question, 'user');
-
-            const url = `https://api.nofiltergpt.com/v1/chat/completions?api_key=${apiKey}`;
-
-            const data = {
-                messages: [
-                    { role: "system", content: "You are a helpful assistant." },
-                    { role: "user", content: question }
-                ],
-                temperature: temperature,
-                max_tokens: max_tokens,
-                top_p: top_p
-            };
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const aiResponse = data.choices[0].message.content;
-                    addMessage(aiResponse, 'assistant');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    addMessage("Sorry, something went wrong.", 'assistant');
-                });
-
-            document.getElementById('message-options').style.display = 'none';
-        });
-
-        // Save chat history to localStorage
-        function saveChatHistory() {
-            const historyJSON = JSON.stringify(chatHistory);
-            localStorage.setItem('chatHistory', historyJSON);
-        }
-
-        // Load chat history from localStorage
-        function loadChatHistory() {
-            const historyJSON = localStorage.getItem('chatHistory');
-            if (historyJSON) {
-                chatHistory = JSON.parse(historyJSON);
-                chatHistory.forEach(message => {
-                    addMessage(message.content, message.sender);
-                });
-            }
-        }
-
-        // Load chat history when page loads
-        window.onload = loadChatHistory;
     </script>
 </body>
 </html>
