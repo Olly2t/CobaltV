@@ -1,136 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🧠 Link Bypasser Beast Mode</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multi-Link Bypasser</title>
   <style>
     body {
-      background: #0d0d0d;
-      color: #f2f2f2;
-      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
     }
-
     .container {
-      background: #1a1a1a;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 30px #00ffe1;
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-      animation: glow 2s infinite alternate;
-    }
-
-    @keyframes glow {
-      from {
-        box-shadow: 0 0 20px #00ffe1;
-      }
-      to {
-        box-shadow: 0 0 40px #00ffe1;
-      }
-    }
-
-    input[type="text"] {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
       width: 90%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: none;
-      border-radius: 8px;
-      background: #2a2a2a;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
+      max-width: 500px;
+      box-shadow: 0 0 10px #00ffe1;
     }
-
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
     button {
-      padding: 10px 24px;
-      background: #00ffe1;
+      padding: 10px 20px;
+      background-color: #00ffe1;
       border: none;
-      color: #000;
-      border-radius: 8px;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: bold;
       font-size: 16px;
-      transition: 0.3s ease;
+      color: #000;
     }
-
-    button:hover {
-      background: #00bfa5;
-    }
-
     .result {
       margin-top: 20px;
-      background: #111;
-      padding: 12px;
-      border-radius: 8px;
       word-break: break-all;
-      border: 1px solid #00ffe1;
-    }
-
-    .copy-btn {
-      margin-top: 10px;
-      background: transparent;
-      color: #00ffe1;
-      border: 1px solid #00ffe1;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>⚡ Link Bypasser</h2>
-    <input type="text" id="linkInput" placeholder="Paste shortened link here..." />
+    <h2>Multi-Link Bypasser</h2>
+    <input type="text" id="urlInput" placeholder="Enter shortened URL here" />
     <button onclick="bypassLink()">Bypass</button>
-
-    <div id="resultBox" class="result" style="display:none;"></div>
-    <button id="copyBtn" class="copy-btn" style="display:none;" onclick="copyResult()">Copy</button>
+    <div class="result" id="result"></div>
   </div>
-
-  <script>
-    async function bypassLink() {
-      const link = document.getElementById("linkInput").value.trim();
-      const resultBox = document.getElementById("resultBox");
-      const copyBtn = document.getElementById("copyBtn");
-
-      resultBox.style.display = "block";
-      resultBox.textContent = "⏳ Working...";
-
-      try {
-        let finalLink;
-
-        if (link.includes("linkvertise.com")) {
-          finalLink = await fakeBypass(link); // Replace with real one later
-        } else if (link.includes("boost.ink")) {
-          finalLink = await fakeBypass(link);
-        } else {
-          resultBox.textContent = "❌ Unsupported link type.";
-          copyBtn.style.display = "none";
-          return;
-        }
-
-        resultBox.textContent = `✅ Final URL: ${finalLink}`;
-        copyBtn.style.display = "inline-block";
-      } catch (e) {
-        resultBox.textContent = "❌ Error bypassing link.";
-        copyBtn.style.display = "none";
-      }
-    }
-
-    async function fakeBypass(link) {
-      // Placeholder for real API / automation logic
-      return "https://example.com/real-url-from/" + btoa(link);
-    }
-
-    function copyResult() {
-      const result = document.getElementById("resultBox").textContent.replace("✅ Final URL: ", "");
-      navigator.clipboard.writeText(result).then(() => {
-        alert("✅ Copied to clipboard!");
-      });
-    }
-  </script>
+  <script src="bypasser.js"></script>
 </body>
 </html>
