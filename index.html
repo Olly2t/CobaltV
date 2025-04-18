@@ -1,99 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ScriptBlox Admin Search</title>
-    <style>
-        body {
-            background-color: #0f0f0f;
-            color: #f1f1f1;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            padding: 20px;
-            text-align: center;
-            background-color: #1a1a1a;
-            font-size: 1.5em;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        #results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-            padding: 20px;
-        }
-
-        .script {
-            background-color: #1c1c1c;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 15px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .script:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .script h3 {
-            margin: 0 0 10px;
-            font-size: 1.2em;
-            color: #00ffcc;
-        }
-
-        .script p {
-            margin: 0;
-            font-size: 0.95em;
-            color: #ccc;
-        }
-
-        .error {
-            color: #ff5555;
-            text-align: center;
-            padding: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Basic Link Bypasser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 100px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 400px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+    button {
+      background-color: #2e89ff;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <header>ScriptBlox – Admin Scripts</header>
-    <div id="results">Loading scripts...</div>
 
-    <script>
-        fetch("https://scriptblox.com/api/script/search?q=admin")
-            .then((res) => res.json())
-            .then((data) => {
-                const results = document.getElementById('results');
-                results.innerHTML = ""; // clear "Loading..."
+  <h2>Basic Link Bypasser</h2>
+  <input type="text" id="linkInput" placeholder="Paste shortened link here..." />
+  <button onclick="bypass()">Bypass</button>
+  <p id="result"></p>
 
-                for (const script of data.result.scripts) {
-                    const scriptElement = document.createElement('div');
-                    scriptElement.classList.add('script');
+  <script>
+    function getQueryParam(url, param) {
+      try {
+        const parsedUrl = new URL(url);
+        return parsedUrl.searchParams.get(param);
+      } catch (e) {
+        return null;
+      }
+    }
 
-                    const titleElement = document.createElement('h3');
-                    titleElement.textContent = script.title;
-                    scriptElement.appendChild(titleElement);
+    function decodeBase64(str) {
+      try {
+        return atob(str);
+      } catch (e) {
+        return "Invalid base64 string!";
+      }
+    }
 
-                    const slugElement = document.createElement('p');
-                    slugElement.textContent = `Slug: ${script.slug}`;
-                    scriptElement.appendChild(slugElement);
+    function bypass() {
+      const input = document.getElementById('linkInput').value;
+      const encoded = getQueryParam(input, 'url');
+      const decoded = decodeBase64(encoded);
 
-                    scriptElement.onclick = () => {
-                        window.open(`https://scriptblox.com/script/${script.slug}`, "_blank");
-                    };
+      const result = document.getElementById('result');
+      if (decoded && decoded.startsWith("http")) {
+        result.innerHTML = `Bypassed link: <a href="${decoded}" target="_blank">${decoded}</a>`;
+      } else {
+        result.textContent = "Failed to decode or invalid format.";
+      }
+    }
+  </script>
 
-                    results.appendChild(scriptElement);
-                }
-            })
-            .catch((error) => {
-                console.error('Error while fetching scripts', error);
-                const results = document.getElementById('results');
-                results.innerHTML = `<p class="error">Error while fetching scripts: ${error.message}</p>`;
-            });
-    </script>
 </body>
 </html>
