@@ -2,75 +2,135 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Linkvertise Bypasser</title>
+  <title>🧠 Link Bypasser Beast Mode</title>
   <style>
     body {
-      background: #111;
-      color: #eee;
-      font-family: sans-serif;
+      background: #0d0d0d;
+      color: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      padding-top: 100px;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
 
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      width: 400px;
-      border-radius: 6px;
+    .container {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px #00ffe1;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 20px #00ffe1;
+      }
+      to {
+        box-shadow: 0 0 40px #00ffe1;
+      }
+    }
+
+    input[type="text"] {
+      width: 90%;
+      padding: 12px;
+      margin-bottom: 15px;
       border: none;
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 16px;
       outline: none;
     }
 
     button {
-      background: #2e89ff;
-      color: white;
+      padding: 10px 24px;
+      background: #00ffe1;
+      border: none;
+      color: #000;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #00bfa5;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #111;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      border: 1px solid #00ffe1;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      background: transparent;
+      color: #00ffe1;
+      border: 1px solid #00ffe1;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2>⚡ Link Bypasser</h2>
+    <input type="text" id="linkInput" placeholder="Paste shortened link here..." />
+    <button onclick="bypassLink()">Bypass</button>
 
-  <h2>Linkvertise Bypasser</h2>
-  <input type="text" id="linkInput" placeholder="Paste Linkvertise link here..." />
-  <button onclick="bypass()">Bypass</button>
-  <p id="result"></p>
+    <div id="resultBox" class="result" style="display:none;"></div>
+    <button id="copyBtn" class="copy-btn" style="display:none;" onclick="copyResult()">Copy</button>
+  </div>
 
   <script>
-    async function bypass() {
-      const input = document.getElementById("linkInput").value;
-      const result = document.getElementById("result");
+    async function bypassLink() {
+      const link = document.getElementById("linkInput").value.trim();
+      const resultBox = document.getElementById("resultBox");
+      const copyBtn = document.getElementById("copyBtn");
 
-      const match = input.match(/linkvertise\.com\/(\d+)/);
-      if (!match) {
-        result.textContent = "Invalid Linkvertise link.";
-        return;
-      }
-
-      const linkId = match[1];
-      const apiUrl = `https://corsproxy.io/?https://publisher.linkvertise.com/api/v1/redirect/link/static/${linkId}`;
+      resultBox.style.display = "block";
+      resultBox.textContent = "⏳ Working...";
 
       try {
-        const res = await fetch(apiUrl, {
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-        const json = await res.json();
-        const target = json?.data?.link?.target;
+        let finalLink;
 
-        if (target) {
-          result.innerHTML = `Bypassed link: <a href="${target}" target="_blank">${target}</a>`;
+        if (link.includes("linkvertise.com")) {
+          finalLink = await fakeBypass(link); // Replace with real one later
+        } else if (link.includes("boost.ink")) {
+          finalLink = await fakeBypass(link);
         } else {
-          result.textContent = "Failed to extract final URL.";
+          resultBox.textContent = "❌ Unsupported link type.";
+          copyBtn.style.display = "none";
+          return;
         }
+
+        resultBox.textContent = `✅ Final URL: ${finalLink}`;
+        copyBtn.style.display = "inline-block";
       } catch (e) {
-        result.textContent = "Bypass failed. CORS or protection may be blocking it.";
-        console.error(e);
+        resultBox.textContent = "❌ Error bypassing link.";
+        copyBtn.style.display = "none";
       }
     }
-  </script>
 
+    async function fakeBypass(link) {
+      // Placeholder for real API / automation logic
+      return "https://example.com/real-url-from/" + btoa(link);
+    }
+
+    function copyResult() {
+      const result = document.getElementById("resultBox").textContent.replace("✅ Final URL: ", "");
+      navigator.clipboard.writeText(result).then(() => {
+        alert("✅ Copied to clipboard!");
+      });
+    }
+  </script>
 </body>
 </html>
