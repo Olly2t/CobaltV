@@ -2,27 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Basic Link Bypasser</title>
+  <title>Linkvertise Bypasser</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       background: #111;
       color: #eee;
+      font-family: sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 100px;
+      padding-top: 100px;
     }
+
     input, button {
       padding: 10px;
       margin: 10px;
       width: 400px;
-      border-radius: 5px;
+      border-radius: 6px;
       border: none;
       outline: none;
     }
+
     button {
-      background-color: #2e89ff;
+      background: #2e89ff;
       color: white;
       cursor: pointer;
     }
@@ -30,39 +32,42 @@
 </head>
 <body>
 
-  <h2>Basic Link Bypasser</h2>
-  <input type="text" id="linkInput" placeholder="Paste shortened link here..." />
+  <h2>Linkvertise Bypasser</h2>
+  <input type="text" id="linkInput" placeholder="Paste Linkvertise link here..." />
   <button onclick="bypass()">Bypass</button>
   <p id="result"></p>
 
   <script>
-    function getQueryParam(url, param) {
-      try {
-        const parsedUrl = new URL(url);
-        return parsedUrl.searchParams.get(param);
-      } catch (e) {
-        return null;
+    async function bypass() {
+      const input = document.getElementById("linkInput").value;
+      const result = document.getElementById("result");
+
+      const match = input.match(/linkvertise\.com\/(\d+)/);
+      if (!match) {
+        result.textContent = "Invalid Linkvertise link.";
+        return;
       }
-    }
 
-    function decodeBase64(str) {
+      const linkId = match[1];
+      const apiUrl = `https://corsproxy.io/?https://publisher.linkvertise.com/api/v1/redirect/link/static/${linkId}`;
+
       try {
-        return atob(str);
+        const res = await fetch(apiUrl, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+        const json = await res.json();
+        const target = json?.data?.link?.target;
+
+        if (target) {
+          result.innerHTML = `Bypassed link: <a href="${target}" target="_blank">${target}</a>`;
+        } else {
+          result.textContent = "Failed to extract final URL.";
+        }
       } catch (e) {
-        return "Invalid base64 string!";
-      }
-    }
-
-    function bypass() {
-      const input = document.getElementById('linkInput').value;
-      const encoded = getQueryParam(input, 'url');
-      const decoded = decodeBase64(encoded);
-
-      const result = document.getElementById('result');
-      if (decoded && decoded.startsWith("http")) {
-        result.innerHTML = `Bypassed link: <a href="${decoded}" target="_blank">${decoded}</a>`;
-      } else {
-        result.textContent = "Failed to decode or invalid format.";
+        result.textContent = "Bypass failed. CORS or protection may be blocking it.";
+        console.error(e);
       }
     }
   </script>
