@@ -3,57 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multi-Link Bypasser</title>
+  <title>ScriptBlox Latest Scripts</title>
   <style>
     body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #0e0e10;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      padding: 2rem;
     }
-    .container {
-      background-color: #1e1e1e;
-      padding: 20px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 0 10px #00ffe1;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #00bcd4;
+      animation: fadeIn 1s ease-out;
     }
-    input[type="text"] {
+
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
       width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      font-size: 16px;
+      max-width: 1200px;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #00ffe1;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      color: #000;
+
+    .script {
+      background: #1a1a1d;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.5s ease-out;
     }
-    .result {
-      margin-top: 20px;
-      word-break: break-all;
+
+    .script:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 188, 212, 0.3);
+    }
+
+    .script h3 {
+      margin: 0 0 0.5rem;
+      color: #00e5ff;
+    }
+
+    .script p {
+      margin: 0;
+      color: #ccc;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .error {
+      color: #ff5252;
+      font-weight: bold;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Multi-Link Bypasser</h2>
-    <input type="text" id="urlInput" placeholder="Enter shortened URL here" />
-    <button onclick="bypassLink()">Bypass</button>
-    <div class="result" id="result"></div>
-  </div>
-  <script src="bypasser.js"></script>
+  <h1>Latest Scripts from ScriptBlox</h1>
+  <div id="results"></div>
+
+  <script>
+    fetch("https://scriptblox.com/api/script/fetch")
+      .then((res) => res.json())
+      .then((data) => {
+        const results = document.getElementById('results');
+
+        for (const script of data.result.scripts) {
+          const scriptElement = document.createElement('div');
+          scriptElement.classList.add('script');
+
+          const titleElement = document.createElement('h3');
+          titleElement.textContent = `Title: ${script.title}`;
+          scriptElement.appendChild(titleElement);
+
+          const slugElement = document.createElement('p');
+          slugElement.textContent = `Slug: ${script.slug}`;
+          scriptElement.appendChild(slugElement);
+
+          results.appendChild(scriptElement);
+        }
+      })
+      .catch((error) => {
+        console.error('Error while fetching scripts', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = `Error: ${error.message}`;
+        errorMessage.classList.add('error');
+        document.getElementById('results').appendChild(errorMessage);
+      });
+  </script>
 </body>
 </html>
