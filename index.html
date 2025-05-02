@@ -1,330 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Web Executor UI</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    :root {
-      --bg: #1e1e2f;
-      --bg-glass: rgba(30, 30, 47, 0.6);
-      --text: white;
-      --accent: #00bfff;
-      --border: #444;
-      --hover: #3a3a55;
-      --icon: #aaa;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth UI with Lucide Icons</title>
+    <link href="https://cdn.jsdelivr.net/npm/monaco-editor@0.35.0/min/vs/editor/editor.main.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@lucide-icons/web@0.1.0/dist/lucide.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Monaco', monospace;
+            background-color: #2c2c2c;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    body.light {
-      --bg: #f0f0f0;
-      --bg-glass: rgba(255, 255, 255, 0.6);
-      --text: #222;
-      --accent: #007acc;
-      --border: #ccc;
-      --hover: #e0e0e0;
-      --icon: #666;
-    }
+        /* Tab system */
+        .tabs {
+            display: flex;
+            background-color: #444;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
+        .tab:hover {
+            background-color: #555;
+        }
 
-    .title-bar {
-      height: 30px;
-      backdrop-filter: blur(8px);
-      background-color: var(--bg-glass);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 15px;
-      border-bottom: 1px solid var(--border);
-    }
+        .tab-active {
+            background-color: #666;
+        }
 
-    .window-buttons {
-      display: flex;
-      gap: 10px;
-    }
+        /* Tab content */
+        .tab-content {
+            padding: 20px;
+            background-color: #333;
+            width: 300px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-    .window-btn {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
+        /* Lucide icon style */
+        .icon {
+            margin-right: 10px;
+        }
 
-    .window-btn:hover {
-      transform: scale(1.2);
-      box-shadow: 0 0 5px #fff3;
-    }
-
-    .close    { background-color: #ff5f56; }
-    .minimize { background-color: #ffbd2e; }
-    .maximize { background-color: #27c93f; }
-
-    .theme-toggle {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text);
-      font-size: 13px;
-      opacity: 0.8;
-      transition: opacity 0.2s ease;
-    }
-
-    .theme-toggle:hover {
-      opacity: 1;
-    }
-
-    .content {
-      flex: 1;
-      padding: 20px;
-      backdrop-filter: blur(12px);
-      background-color: var(--bg-glass);
-      transition: background 0.3s ease;
-    }
-
-    .tab {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .tab.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      backdrop-filter: blur(8px);
-      background-color: var(--bg-glass);
-      border-top: 1px solid var(--border);
-      transition: background 0.3s ease;
-    }
-
-    .nav-button {
-      flex: 1;
-      text-align: center;
-      padding: 12px 0;
-      cursor: pointer;
-      color: var(--icon);
-      transition: background 0.2s ease, color 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .nav-button svg {
-      stroke: var(--icon);
-      transition: stroke 0.2s ease;
-    }
-
-    .nav-button.active,
-    .nav-button:hover {
-      background-color: var(--hover);
-      color: var(--accent);
-    }
-
-    .nav-button.active svg,
-    .nav-button:hover svg {
-      stroke: var(--accent);
-    }
-
-    /* 🔥 Animated Welcome Text */
-    .welcome-text {
-      font-size: 2.5rem;
-      font-weight: bold;
-      animation: fadeSlideIn 1s ease-out forwards;
-      opacity: 0;
-      transform: translateY(20px);
-      margin-bottom: 10px;
-    }
-
-    @keyframes fadeSlideIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Popup Modal Styling */
-    #popupModal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 300px;
-      background-color: var(--bg-glass);
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      z-index: 100;
-      display: none;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    #popupModal.active {
-      display: block;
-      opacity: 1;
-    }
-
-    .popup-input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border: 2px solid var(--border);
-      background-color: var(--bg-glass);
-      color: var(--text);
-      font-size: 16px;
-    }
-
-    .popup-button {
-      width: 100%;
-      padding: 10px;
-      background-color: var(--accent);
-      border: none;
-      color: var(--text);
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
-    }
-
-    .popup-button:hover {
-      background-color: #0088cc;
-    }
-
-  </style>
+        /* Smooth Monaco font styling */
+        pre {
+            font-size: 14px;
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Popup Modal -->
-  <div id="popupModal" class="popup">
-    <h3>Enter your Roblox Username</h3>
-    <input type="text" id="usernameInput" class="popup-input" placeholder="Roblox Username" />
-    <button class="popup-button" onclick="validateUsername()">Submit</button>
-  </div>
-
-  <div class="title-bar">
-    <div class="window-buttons">
-      <div class="window-btn close" title="Close"></div>
-      <div class="window-btn minimize" title="Minimize"></div>
-      <div class="window-btn maximize" title="Maximize"></div>
+    <div class="tabs">
+        <div class="tab tab-active">
+            <span class="icon lucide-home"></span> Home
+        </div>
+        <div class="tab">
+            <span class="icon lucide-settings"></span> Settings
+        </div>
+        <div class="tab">
+            <span class="icon lucide-info"></span> Info
+        </div>
     </div>
-    <div class="theme-toggle" onclick="toggleTheme()">
-      <i data-lucide="sun" id="themeIcon"></i>
-      <span id="themeText">Light Mode</span>
+
+    <div class="tab-content">
+        <h2>Home Content</h2>
+        <pre>// Write some code or content here...</pre>
     </div>
-  </div>
 
-  <div class="content">
-    <div id="dashboardTab" class="tab active">
-      <h2 class="welcome-text">Welcome</h2>
-      <p>Welcome to the Dashboard.</p>
-      <div id="userInfo"></div>
-      <img id="userThumbnail" style="width: 100px; border-radius: 50%;" />
-    </div>
-    <div id="executionTab" class="tab">
-      <h2>Execution</h2>
-      <p>Script execution area goes here.</p>
-    </div>
-    <div id="settingsTab" class="tab">
-      <h2>Settings</h2>
-      <p>Adjust your settings here.</p>
-    </div>
-  </div>
+    <script>
+        // JavaScript to toggle tabs
+        const tabs = document.querySelectorAll('.tab');
+        const content = document.querySelector('.tab-content');
 
-  <div class="bottom-nav">
-    <div class="nav-button active" onclick="showTab('dashboard', this)">
-      <i data-lucide="layout-dashboard"></i>
-      <span>Dashboard</span>
-    </div>
-    <div class="nav-button" onclick="showTab('execution', this)">
-      <i data-lucide="terminal"></i>
-      <span>Execution</span>
-    </div>
-    <div class="nav-button" onclick="showTab('settings', this)">
-      <i data-lucide="settings"></i>
-      <span>Settings</span>
-    </div>
-  </div>
-
-  <script>
-    lucide.createIcons();
-
-    // Show the popup modal on page load
-    window.onload = function() {
-      document.getElementById('popupModal').classList.add('active');
-    };
-
-    function validateUsername() {
-      const username = document.getElementById('usernameInput').value;
-      if (!username) {
-        alert("Please enter a valid Roblox username.");
-        return;
-      }
-
-      // Call Roblox API (if necessary) to validate the username here
-      fetch(`https://api.roblox.com/users/get-by-username?username=${username}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            const displayName = data.DisplayName;
-            const userId = data.UserId;
-            const avatarUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
-
-            // Display user info on Dashboard tab
-            document.getElementById('userInfo').innerHTML = `
-              <p>Username: ${username}</p>
-              <p>Display Name: ${displayName}</p>
-            `;
-            document.getElementById('userThumbnail').src = avatarUrl;
-
-            // Close the popup
-            document.getElementById('popupModal').classList.remove('active');
-          } else {
-            alert("Invalid Roblox username. Please try again.");
-          }
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('tab-active'));
+                tab.classList.add('tab-active');
+                content.innerHTML = `<h2>Content for Tab ${index + 1}</h2><pre>// New content based on the tab</pre>`;
+            });
         });
-    }
-
-    function showTab(tabName, el) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabName + 'Tab').classList.add('active');
-
-      document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    function toggleTheme() {
-      const body = document.body;
-      const isLight = body.classList.toggle('light');
-      document.getElementById('themeText').textContent = isLight ? 'Dark Mode' : 'Light Mode';
-      document.getElementById('themeIcon').setAttribute('data-lucide', isLight ? 'moon' : 'sun');
-      lucide.createIcons();
-    }
-  </script>
-
+    </script>
 </body>
 </html>
