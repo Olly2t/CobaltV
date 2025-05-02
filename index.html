@@ -1,119 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ScriptBlox Latest Scripts</title>
+  <meta charset="UTF-8">
+  <title>Web Executor UI</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body {
+    :root {
+      --bg: #1e1e2f;
+      --bg-glass: rgba(30, 30, 47, 0.6);
+      --text: white;
+      --accent: #00bfff;
+      --border: #444;
+      --hover: #3a3a55;
+      --icon: #aaa;
+    }
+
+    body.light {
+      --bg: #f0f0f0;
+      --bg-glass: rgba(255, 255, 255, 0.6);
+      --text: #222;
+      --accent: #007acc;
+      --border: #ccc;
+      --hover: #e0e0e0;
+      --icon: #666;
+    }
+
+    * {
       margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: #0e0e10;
-      color: #fff;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .title-bar {
+      height: 30px;
+      backdrop-filter: blur(8px);
+      background-color: var(--bg-glass);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .window-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .window-btn {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .window-btn:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 5px #fff3;
+    }
+
+    .close    { background-color: #ff5f56; }
+    .minimize { background-color: #ffbd2e; }
+    .maximize { background-color: #27c93f; }
+
+    .theme-toggle {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font-size: 13px;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      opacity: 1;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      background-color: var(--bg-glass);
+      transition: background 0.3s ease;
+    }
+
+    .tab {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      backdrop-filter: blur(8px);
+      background-color: var(--bg-glass);
+      border-top: 1px solid var(--border);
+      transition: background 0.3s ease;
+    }
+
+    .nav-button {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      cursor: pointer;
+      color: var(--icon);
+      transition: background 0.2s ease, color 0.2s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
+      gap: 4px;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      color: #00bcd4;
-      animation: fadeIn 1s ease-out;
+    .nav-button svg {
+      stroke: var(--icon);
+      transition: stroke 0.2s ease;
     }
 
-    #results {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 1200px;
+    .nav-button.active,
+    .nav-button:hover {
+      background-color: var(--hover);
+      color: var(--accent);
     }
 
-    .script {
-      background: #1a1a1d;
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeInUp 0.5s ease-out;
+    .nav-button.active svg,
+    .nav-button:hover svg {
+      stroke: var(--accent);
     }
 
-    .script:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 188, 212, 0.3);
+    /* 🔥 Animated Welcome Text */
+    .welcome-text {
+      font-size: 2.5rem;
+      font-weight: bold;
+      animation: fadeSlideIn 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+      margin-bottom: 10px;
     }
 
-    .script h3 {
-      margin: 0 0 0.5rem;
-      color: #00e5ff;
-    }
-
-    .script p {
-      margin: 0;
-      color: #ccc;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
+    @keyframes fadeSlideIn {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+    /* Popup Modal Styling */
+    #popupModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background-color: var(--bg-glass);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
     }
 
-    .error {
-      color: #ff5252;
-      font-weight: bold;
-      margin-top: 1rem;
+    #popupModal.active {
+      display: block;
+      opacity: 1;
     }
+
+    .popup-input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background-color: var(--bg-glass);
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .popup-button {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--accent);
+      border: none;
+      color: var(--text);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .popup-button:hover {
+      background-color: #0088cc;
+    }
+
   </style>
 </head>
 <body>
-  <h1>Latest Scripts from ScriptBlox</h1>
-  <div id="results"></div>
+
+  <!-- Popup Modal -->
+  <div id="popupModal" class="popup">
+    <h3>Enter your Roblox Username</h3>
+    <input type="text" id="usernameInput" class="popup-input" placeholder="Roblox Username" />
+    <button class="popup-button" onclick="validateUsername()">Submit</button>
+  </div>
+
+  <div class="title-bar">
+    <div class="window-buttons">
+      <div class="window-btn close" title="Close"></div>
+      <div class="window-btn minimize" title="Minimize"></div>
+      <div class="window-btn maximize" title="Maximize"></div>
+    </div>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <i data-lucide="sun" id="themeIcon"></i>
+      <span id="themeText">Light Mode</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="dashboardTab" class="tab active">
+      <h2 class="welcome-text">Welcome</h2>
+      <p>Welcome to the Dashboard.</p>
+      <div id="userInfo"></div>
+      <img id="userThumbnail" style="width: 100px; border-radius: 50%;" />
+    </div>
+    <div id="executionTab" class="tab">
+      <h2>Execution</h2>
+      <p>Script execution area goes here.</p>
+    </div>
+    <div id="settingsTab" class="tab">
+      <h2>Settings</h2>
+      <p>Adjust your settings here.</p>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-button active" onclick="showTab('dashboard', this)">
+      <i data-lucide="layout-dashboard"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-button" onclick="showTab('execution', this)">
+      <i data-lucide="terminal"></i>
+      <span>Execution</span>
+    </div>
+    <div class="nav-button" onclick="showTab('settings', this)">
+      <i data-lucide="settings"></i>
+      <span>Settings</span>
+    </div>
+  </div>
 
   <script>
-    fetch("https://scriptblox.com/api/script/fetch")
-      .then((res) => res.json())
-      .then((data) => {
-        const results = document.getElementById('results');
+    lucide.createIcons();
 
-        for (const script of data.result.scripts) {
-          const scriptElement = document.createElement('div');
-          scriptElement.classList.add('script');
+    // Show the popup modal on page load
+    window.onload = function() {
+      document.getElementById('popupModal').classList.add('active');
+    };
 
-          const titleElement = document.createElement('h3');
-          titleElement.textContent = `Title: ${script.title}`;
-          scriptElement.appendChild(titleElement);
+    function validateUsername() {
+      const username = document.getElementById('usernameInput').value;
+      if (!username) {
+        alert("Please enter a valid Roblox username.");
+        return;
+      }
 
-          const slugElement = document.createElement('p');
-          slugElement.textContent = `Slug: ${script.slug}`;
-          scriptElement.appendChild(slugElement);
+      // Call Roblox API (if necessary) to validate the username here
+      fetch(`https://api.roblox.com/users/get-by-username?username=${username}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const displayName = data.DisplayName;
+            const userId = data.UserId;
+            const avatarUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
 
-          results.appendChild(scriptElement);
-        }
-      })
-      .catch((error) => {
-        console.error('Error while fetching scripts', error);
-        const errorMessage = document.createElement('p');
-        errorMessage.textContent = `Error: ${error.message}`;
-        errorMessage.classList.add('error');
-        document.getElementById('results').appendChild(errorMessage);
-      });
+            // Display user info on Dashboard tab
+            document.getElementById('userInfo').innerHTML = `
+              <p>Username: ${username}</p>
+              <p>Display Name: ${displayName}</p>
+            `;
+            document.getElementById('userThumbnail').src = avatarUrl;
+
+            // Close the popup
+            document.getElementById('popupModal').classList.remove('active');
+          } else {
+            alert("Invalid Roblox username. Please try again.");
+          }
+        });
+    }
+
+    function showTab(tabName, el) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabName + 'Tab').classList.add('active');
+
+      document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const isLight = body.classList.toggle('light');
+      document.getElementById('themeText').textContent = isLight ? 'Dark Mode' : 'Light Mode';
+      document.getElementById('themeIcon').setAttribute('data-lucide', isLight ? 'moon' : 'sun');
+      lucide.createIcons();
+    }
   </script>
+
 </body>
 </html>
