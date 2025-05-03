@@ -1,105 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smooth UI with Lucide Icons</title>
-    <link href="https://cdn.jsdelivr.net/npm/monaco-editor@0.35.0/min/vs/editor/editor.main.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@lucide-icons/web@0.1.0/dist/lucide.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Monaco', monospace;
-            background-color: #2c2c2c;
-            color: white;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <title>My Loops & Samples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Reset and base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* Tab system */
-        .tabs {
-            display: flex;
-            background-color: #444;
-            border-radius: 8px 8px 0 0;
-            overflow: hidden;
-        }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
 
-        .tab {
-            padding: 15px 30px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.5em;
+    }
 
-        .tab:hover {
-            background-color: #555;
-        }
+    /* Container */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
 
-        .tab-active {
-            background-color: #666;
-        }
+    /* Loop card */
+    .loop {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s ease, background 0.3s;
+    }
 
-        /* Tab content */
-        .tab-content {
-            padding: 20px;
-            background-color: #333;
-            width: 300px;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+    .loop:hover {
+      transform: scale(1.02);
+      background: rgba(255, 255, 255, 0.08);
+    }
 
-        /* Lucide icon style */
-        .icon {
-            margin-right: 10px;
-        }
+    .loop h2 {
+      margin-bottom: 10px;
+      font-size: 1.4em;
+    }
 
-        /* Smooth Monaco font styling */
-        pre {
-            font-size: 14px;
-            background-color: #1e1e1e;
-            color: #dcdcdc;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-    </style>
+    .loop p {
+      margin-bottom: 15px;
+      color: #ccc;
+    }
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      background: #1f1f1f;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn:hover {
+      background: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    @media (max-width: 600px) {
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>🎧 My Loops & Samples</h1>
 
-    <div class="tabs">
-        <div class="tab tab-active">
-            <span class="icon lucide-home"></span> Home
-        </div>
-        <div class="tab">
-            <span class="icon lucide-settings"></span> Settings
-        </div>
-        <div class="tab">
-            <span class="icon lucide-info"></span> Info
-        </div>
+    <!-- Sample Loop Card -->
+    <div class="loop">
+      <h2>Lo-Fi Chill Loop</h2>
+      <p>A mellow loop for background or chillhop beats. Tempo: 85 BPM</p>
+      <div class="buttons">
+        <button class="btn" onclick="window.open('your-download-link.mp3')">Download</button>
+        <button class="btn" onclick="window.open('your-preview-link.mp3')">Preview</button>
+      </div>
     </div>
 
-    <div class="tab-content">
-        <h2>Home Content</h2>
-        <pre>// Write some code or content here...</pre>
+    <div class="loop">
+      <h2>Trap Drum Sample</h2>
+      <p>Punchy kicks and crisp snares. Tempo: 140 BPM</p>
+      <div class="buttons">
+        <button class="btn" onclick="window.open('your-download-link.mp3')">Download</button>
+        <button class="btn" onclick="window.open('your-preview-link.mp3')">Preview</button>
+      </div>
     </div>
 
-    <script>
-        // JavaScript to toggle tabs
-        const tabs = document.querySelectorAll('.tab');
-        const content = document.querySelector('.tab-content');
-
-        tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('tab-active'));
-                tab.classList.add('tab-active');
-                content.innerHTML = `<h2>Content for Tab ${index + 1}</h2><pre>// New content based on the tab</pre>`;
-            });
-        });
-    </script>
+    <!-- Add more loops below -->
+  </div>
 </body>
 </html>
