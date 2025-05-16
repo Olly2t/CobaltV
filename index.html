@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Loops & Samples</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Sound Packs</title>
   <style>
-    /* Reset and base */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
     * {
       margin: 0;
       padding: 0;
@@ -13,105 +14,103 @@
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Poppins', sans-serif;
       background: #0f0f0f;
       color: #fff;
-      padding: 40px 20px;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 40px;
-      font-size: 2.5em;
-    }
-
-    /* Container */
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    /* Loop card */
-    .loop {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 15px;
+      font-size: 2.5rem;
       margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-      transition: transform 0.2s ease, background 0.3s;
+      background: linear-gradient(90deg, #00d2ff, #3a47d5);
+      -webkit-background-clip: text;
+      color: transparent;
     }
 
-    .loop:hover {
-      transform: scale(1.02);
-      background: rgba(255, 255, 255, 0.08);
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
     }
 
-    .loop h2 {
-      margin-bottom: 10px;
-      font-size: 1.4em;
+    .product-card {
+      background: #1a1a1a;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
     }
 
-    .loop p {
-      margin-bottom: 15px;
+    .product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .product-content {
+      padding: 16px;
+    }
+
+    .product-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .product-description {
+      font-size: 0.95rem;
       color: #ccc;
     }
 
-    /* Buttons */
-    .buttons {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      background: #1f1f1f;
-      border: none;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    .btn:hover {
-      background: #3a3a3a;
-      transform: translateY(-2px);
-    }
-
-    .btn:active {
-      transform: scale(0.95);
-    }
-
-    @media (max-width: 600px) {
-      .buttons {
-        flex-direction: column;
-      }
+    footer {
+      margin-top: 40px;
+      font-size: 0.85rem;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎧 My Loops & Samples</h1>
 
-    <!-- Sample Loop Card -->
-    <div class="loop">
-      <h2>Lo-Fi Chill Loop</h2>
-      <p>A mellow loop for background or chillhop beats. Tempo: 85 BPM</p>
-      <div class="buttons">
-        <button class="btn" onclick="window.open('your-download-link.mp3')">Download</button>
+  <h1>🎧 My Sound Packs</h1>
+
+  <div class="product-grid">
+    <!-- Example Product -->
+    <div class="product-card">
+      <img class="product-image" src="https://via.placeholder.com/400x200" alt="Product">
+      <div class="product-content">
+        <div class="product-title">Trap Serum Pack Vol. 1</div>
+        <div class="product-description">50 hard-hitting Serum presets for trap/hip-hop producers.</div>
       </div>
     </div>
 
-    <div class="loop">
-      <h2>Trap Drum Sample</h2>
-      <p>Punchy kicks and crisp snares. Tempo: 140 BPM</p>
-      <div class="buttons">
-        <button class="btn" onclick="window.open('your-download-link.mp3')">Download</button>
+    <!-- Add more products like this -->
+    <div class="product-card">
+      <img class="product-image" src="https://via.placeholder.com/400x200" alt="Product">
+      <div class="product-content">
+        <div class="product-title">MIDI Pack: Dark Melodies</div>
+        <div class="product-description">20 royalty-free MIDI melodies inspired by Metro Boomin & Southside.</div>
       </div>
     </div>
 
-    <!-- Add more loops below -->
+    <!-- Add more blocks here -->
   </div>
+
+  <footer>
+    Made with 🎵 by You | Accepting Robux Gift Cards Only
+  </footer>
+
 </body>
 </html>
